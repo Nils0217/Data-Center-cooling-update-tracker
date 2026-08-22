@@ -1,4 +1,3 @@
-```markdown
 # Zero-Downtime Data Center Cooling & PUE/WUE Tracker: "The Change-Request Factory"
 
 An enterprise-grade, agentic data-change factory engineered to solve data drift, schema vulnerability, and validation latency challenges in modern AI data centers. 
@@ -7,9 +6,6 @@ By unifying **Bright Data external web scraping**, **high-frequency IoT telemetr
 
 ---
 
-## 🏗️ System Architecture & Data Flow
-
-mermaid
 ## 🏗️ System Architecture & Data Flow
 
 ![System Architecture](architecture.png)
@@ -167,8 +163,6 @@ python -m streamlit run app.py
 ```bash
 # Demo Only
 python drift_daemon.py
-
-```
 
 ```
 
