@@ -1,0 +1,41 @@
+{
+  "blueprints": [
+    {
+      "identifier": "equipment",
+      "title": "Equipment Roster",
+      "schema": {
+        "properties": {
+          "pue": { "type": "number", "title": "PUE" },
+          "wue": { "type": "number", "title": "WUE" },
+          "load_kw": { "type": "number", "title": "Load (kW)" },
+          "capacity_kw": { "type": "number", "title": "Capacity (kW)" },
+          "price": { "type": "number", "title": "Price ($)" }
+        }
+      }
+    },
+    {
+      "identifier": "change_request",
+      "title": "Change Request",
+      "schema": {
+        "properties": {
+          "type": { "type": "string", "enum": ["A", "B"], "title": "Request Type" },
+          "verification_result": { "type": "string", "title": "Data Contract Verification" },
+          "status": { "type": "string", "enum": ["pending_approval", "approved", "rejected"], "title": "Status" }
+        }
+      }
+    }
+  ],
+  "actions": [
+    {
+      "identifier": "change-request-review",
+      "title": "Approve / Reject Change Request",
+      "triggerType": "user",
+      "userInputs": {
+        "properties": {
+          "approval_verdict": { "type": "string", "enum": ["Approve", "Reject"] }
+        },
+        "required": ["approval_verdict"]
+      }
+    }
+  ]
+}

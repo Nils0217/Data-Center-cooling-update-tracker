@@ -1,0 +1,87 @@
+flowchart TB
+    HUMAN(["🧑 Operator / Judge"])
+
+    subgraph TERMINAL["🖥️ Coding Agent Terminal"]
+        RULES["Project Rules File (CLAUDE.md)\nScraper config + schema policy"]
+    end
+
+    subgraph BD["🌐 Bright Data Scraper Studio"]
+        SCRAPE["Scrape Jobs\n2 vendor spec pages"]
+        REPAIR["Auto-Repair Engine\ndetects HTML/selector drift"]
+    end
+
+    subgraph MANUAL["✍️ Manual Baseline Input"]
+        BASELINE["Streamlit form\nCurrent fleet: PUE / WUE / price / load / capacity"]
+    end
+
+    subgraph INGEST["🐍 Ingestion + Change Request Layer"]
+        PARSE["Parse scraped JSON"]
+        QUAR["Quarantine\nmalformed records"]
+        CRA["Change Request A\nsystem-generated (scrape/repair)"]
+        CRB["Change Request B\nuser-generated: Simulate Addition"]
+        VERIFY["verify_change_request()\ntype checks + range checks\n(PUE/WUE plausibility, non-negative)"]
+    end
+
+    subgraph PORT["🛠️ Port — Agentic SDLC Platform"]
+        CTX["Context Lake\nBlueprints: Equipment / ChangeRequest"]
+        WF["Workflow: change-request-review\n(single workflow, two entry points)"]
+        APPROVE["Human Approval Action"]
+        REJECT["Auto-Reject + Log\n(failed verification)"]
+    end
+
+    subgraph DUCK["🦆 DuckDB Warehouse"]
+        EXPAND["ALTER TABLE ADD COLUMN\n(vendor_equipment_raw)"]
+        INSERT["INSERT new unit\n(baseline_equipment)"]
+        MARKET["v_market_active\nBlue/Green view"]
+        FLEET["v_fleet_active\nBlue/Green view"]
+    end
+
+    subgraph SIGNOZ["📊 SigNoz — Observability (critical path)"]
+        OTEL["OpenTelemetry SDK\nscrape → drift → repair → verify → approve"]
+        DASH["Dashboard\nlatency · throughput · error rate\ndrift / repair / verification-failure events"]
+        ALERT["Alert: repeated scrape failure"]
+    end
+
+    subgraph APP["📱 Streamlit App"]
+        UI1["Dashboard 1 — Market View\nvendor comparison"]
+        UI2["Dashboard 2 — Fleet View\ncurrent fleet + what-if delta"]
+    end
+
+    RULES --> SCRAPE
+    SCRAPE -- "HTML structure changes" --> REPAIR
+    REPAIR -- "repaired selectors" --> SCRAPE
+    SCRAPE --> PARSE
+    PARSE -- "malformed" --> QUAR
+    PARSE -- "successful scrape / repair" --> CRA
+
+    BASELINE --> FLEET
+    UI2 -- "click Simulate Addition" --> CRB
+
+    CRA --> VERIFY
+    CRB --> VERIFY
+    VERIFY -- "pass" --> WF
+    VERIFY -- "fail" --> REJECT
+    REJECT -.-> CTX
+
+    WF --> APPROVE
+    APPROVE -- "Type A approved" --> EXPAND
+    APPROVE -- "Type B approved" --> INSERT
+    APPROVE -.logged.-> CTX
+
+    EXPAND --> MARKET
+    INSERT --> FLEET
+    MARKET --> UI1
+    FLEET --> UI2
+
+    SCRAPE -. instrumented .-> OTEL
+    REPAIR -. instrumented .-> OTEL
+    VERIFY -. instrumented .-> OTEL
+    APPROVE -. instrumented .-> OTEL
+    OTEL --> DASH
+    DASH --> ALERT
+    ALERT -. notify .-> WF
+
+    HUMAN -- "approves/rejects" --> APPROVE
+    HUMAN -- monitors --> DASH
+    HUMAN -- uses --> UI1
+    HUMAN -- uses --> UI2

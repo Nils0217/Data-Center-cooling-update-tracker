@@ -1,0 +1,15 @@
+# Python cache & virtual environment
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# Database file (keep local database clean/untracked)
+datacenter.duckdb
+datacenter.duckdb.wal
+
+# OS / Editor specific
+.DS_Store
+.vscode/
+.idea/
