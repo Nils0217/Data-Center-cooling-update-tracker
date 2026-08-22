@@ -1,0 +1,29 @@
+flowchart TD
+    subgraph Ingestion_Layer["1. Ingestion & Scrape Layer"]
+        A1["🌐 External Vendor Sites (Submer, CoolIT, Vertiv, RefJet)"] -->|Bright Data Scraping Browser| CR_A["Change Request A (CR-A)"]
+        A2["⚡ Electric Grid Pricing (CAISO, PJM, ERCOT)"] -->|Live Tariff Sync| DB_Tariffs[("DuckDB: grid_energy_tariffs")]
+        A3["📡 HVAC IoT Sensor Telemetry"] -->|Streaming Ingest| DB_IoT[("DuckDB: hvac_iot_telemetry")]
+        A4["👨‍💼 Data Center Operator (What-If Simulation)"] -->|User Submission| CR_B["Change Request B (CR-B)"]
+    end
+
+    subgraph Defense_Gate["2. Strict Data Contract Enforcement Gate"]
+        CR_A --> Gate{"verify_change_request()"}
+        CR_B --> Gate
+        Gate -->|❌ Violated: Out of Bounds / Type Error| DB_Quarantine[("🛡️ DuckDB: quarantine\n(Isolated Audit Box)")]
+        Gate -->|✅ Verified: Physical & Financial Bounds| DB_CR[("DuckDB: change_requests\n(Pending Port Approval)")]
+    end
+
+    subgraph Governance_Layer["3. Port Governance & Atomic Hot-Swap"]
+        DB_CR --> PortApprove["🛡️ Port Human Approval Action\n(execute_approval)"]
+        PortApprove --> AtomicSwap["⚡ DuckDB Atomic View Hot-Swap"]
+        AtomicSwap --> View_Market[("SQL View: v_market_active")]
+        AtomicSwap --> View_Fleet[("SQL View: v_fleet_active")]
+    end
+
+    subgraph Analytics_Presentation["4. Real-Time Analytics & Observability Layer"]
+        View_Market --> Tab1["📊 Tab 1: Market View (Plotly Scatter & Green Zone)"]
+        View_Fleet --> Tab2["🏭 Tab 2: Fleet View (Blended PUE/WUE & ROI)"]
+        DB_IoT & DB_Tariffs --> Tab3["⚡ Tab 3: HVAC IoT Anomaly Mart (PF Penalty)"]
+        DB_Quarantine --> Tab5["🛡️ Tab 5: Audit Trail & Quarantine Ledger"]
+        PortApprove -.->|Trace Spans| SigNoz["📈 SigNoz / OpenTelemetry Distributed Tracing"]
+    end
