@@ -8,7 +8,7 @@ venv/
 # Database file (keep local database clean/untracked)
 datacenter.duckdb
 datacenter.duckdb.wal
-
+CLAUDE.md
 # OS / Editor specific
 .DS_Store
 .vscode/
