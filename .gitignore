@@ -9,6 +9,7 @@ venv/
 datacenter.duckdb
 datacenter.duckdb.wal
 CLAUDE.md
+
 # OS / Editor specific
 .DS_Store
 .vscode/
